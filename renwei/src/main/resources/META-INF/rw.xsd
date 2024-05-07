@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+		targetNamespace="http://www.rw.com/schema/rw"
+		xmlns:tns="http://www.rw.com/schema/rw"
+		elementFormDefault="qualified">
+
+	<!--	rw标签的规则-->
+	<element name="rw">
+		<complexType>
+			<attribute name="id" type="string"/>
+			<attribute name="name" type="string"/>
+			<attribute name="email" type="string"/>
+		</complexType>
+	</element>
+
+</schema>

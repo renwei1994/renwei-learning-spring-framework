@@ -78,11 +78,19 @@ class ConditionEvaluator {
 	 * @return if the item should be skipped
 	 */
 	public boolean shouldSkip(@Nullable AnnotatedTypeMetadata metadata, @Nullable ConfigurationPhase phase) {
+		// metadata 是否等于null 或者是否含有@Conditional标签
 		if (metadata == null || !metadata.isAnnotated(Conditional.class.getName())) {
 			return false;
 		}
-
+		//采用递归的方式进行判断，第一次执行的时候phase为空，向下执行
 		if (phase == null) {
+			//下面的逻辑判断中，需要进入ConfigurationclassUtils.isconfigurationcandidate方法，主要的逻辑如下。
+			// 1、metadata是AnnotationMetadata类的一个实例
+			// 2、检查bean中是否使用@Configuration注解
+			// 3、检查bean不是一个接口
+			// 4、检查bean中是否包含@Component @componentScan @Import @ImportResource中任意一个
+			// 5、检査bean中是否有@Bean注解
+			//只要满足其中1,2或者1,3或者1,4或者1,5就会继续递归
 			if (metadata instanceof AnnotationMetadata &&
 					ConfigurationClassUtils.isConfigurationCandidate((AnnotationMetadata) metadata)) {
 				return shouldSkip(metadata, ConfigurationPhase.PARSE_CONFIGURATION);

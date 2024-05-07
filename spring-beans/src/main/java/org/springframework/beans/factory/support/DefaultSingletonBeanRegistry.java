@@ -214,6 +214,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	public Object getSingleton(String beanName, ObjectFactory<?> singletonFactory) {
 		Assert.notNull(beanName, "Bean name must not be null");
 		synchronized (this.singletonObjects) {
+			// 看一级缓存里面是否含有
 			Object singletonObject = this.singletonObjects.get(beanName);
 			if (singletonObject == null) {
 				if (this.singletonsCurrentlyInDestruction) {
@@ -224,6 +225,13 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				if (logger.isDebugEnabled()) {
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
+				// 记录当前Bean状态为创建中
+				//  检查 singletonsCurrentlyInCreation 是否含有
+				// 	private final Set<String> singletonsCurrentlyInCreation =
+				//			Collections.newSetFromMap(new ConcurrentHashMap<>(16));
+				//  添加到 inCreationCheckExclusions
+				//	private final Set<String> inCreationCheckExclusions =
+				//			Collections.newSetFromMap(new ConcurrentHashMap<>(16));
 				beforeSingletonCreation(beanName);
 				boolean newSingleton = false;
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
@@ -231,6 +239,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					this.suppressedExceptions = new LinkedHashSet<>();
 				}
 				try {
+					// 创建实例对象
 					singletonObject = singletonFactory.getObject();
 					newSingleton = true;
 				}
@@ -254,9 +263,17 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					if (recordSuppressedExceptions) {
 						this.suppressedExceptions = null;
 					}
+					// 删除当前Bean状态为创建中
+					//  检查 singletonsCurrentlyInCreation 是否含有
+					// 	private final Set<String> singletonsCurrentlyInCreation =
+					//			Collections.newSetFromMap(new ConcurrentHashMap<>(16));
+					//  删除 inCreationCheckExclusions
+					//	private final Set<String> inCreationCheckExclusions =
+					//			Collections.newSetFromMap(new ConcurrentHashMap<>(16));
 					afterSingletonCreation(beanName);
 				}
 				if (newSingleton) {
+					//  添加的到三级缓存中
 					addSingleton(beanName, singletonObject);
 				}
 			}

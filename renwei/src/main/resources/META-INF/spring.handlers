@@ -1,0 +1,3 @@
+http\://www.rw.com/schema/user=com.renwei.config.context.CustomUserHandler
+http\://www.rw.com/schema/rw=com.renwei.config.context.CustomeRwHandler
+

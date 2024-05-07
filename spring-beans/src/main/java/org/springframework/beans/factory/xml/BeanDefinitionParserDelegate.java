@@ -412,9 +412,12 @@ public class BeanDefinitionParserDelegate {
 	 */
 	@Nullable
 	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, @Nullable BeanDefinition containingBean) {
+		//  TODO 解析id属性
 		String id = ele.getAttribute(ID_ATTRIBUTE);
+		//  TODO 解析name属性
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
 
+		//  TODO 如果bean有别名的话，那么将别名分割解析
 		List<String> aliases = new ArrayList<>();
 		if (StringUtils.hasLength(nameAttr)) {
 			String[] nameArr = StringUtils.tokenizeToStringArray(nameAttr, MULTI_VALUE_ATTRIBUTE_DELIMITERS);
@@ -430,10 +433,12 @@ public class BeanDefinitionParserDelegate {
 			}
 		}
 
+		// TODO 在ioc容器中不能重名
 		if (containingBean == null) {
 			checkNameUniqueness(beanName, aliases, ele);
 		}
 
+		//  TODO 对bean信息解析完成
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
 		if (beanDefinition != null) {
 			if (!StringUtils.hasText(beanName)) {
@@ -512,17 +517,24 @@ public class BeanDefinitionParserDelegate {
 		}
 
 		try {
+
+			//TODO  创建bean定义 创建装在bean信息的AbstractBeanDefinition对象，实际的实现是GenericBeanDefinitionAbstractBeanDefinition bd = createBeanDefinition(className, parent);className:
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
-
+			//TODO  解析bean标签的各种其他属性
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
+			//TODO  设置description信息
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
-
+			//TODO  解析元数据
 			parseMetaElements(ele, bd);
+			//TODO  解析lookup-methbd属性
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
+			//TODO  解析replaced-method属性
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
-
+			//TODO  解析构造方法
 			parseConstructorArgElements(ele, bd);
+			//TODO  解析Property属性值
 			parsePropertyElements(ele, bd);
+			//TODO  解析单例
 			parseQualifierElements(ele, bd);
 
 			bd.setResource(this.readerContext.getResource());
@@ -776,8 +788,11 @@ public class BeanDefinitionParserDelegate {
 	 * Parse a constructor-arg element.
 	 */
 	public void parseConstructorArgElement(Element ele, BeanDefinition bd) {
+		// index
 		String indexAttr = ele.getAttribute(INDEX_ATTRIBUTE);
+		// type
 		String typeAttr = ele.getAttribute(TYPE_ATTRIBUTE);
+		// name
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
 		if (StringUtils.hasLength(indexAttr)) {
 			try {
@@ -912,8 +927,10 @@ public class BeanDefinitionParserDelegate {
 				"<constructor-arg> element");
 
 		// Should only have one child element: ref, value, list, etc.
+		// TODO 一个属性只能对应一种类型： ref, value, list, 等.
 		NodeList nl = ele.getChildNodes();
 		Element subElement = null;
+		// TODO description meta暂不处理
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
 			if (node instanceof Element && !nodeNameEquals(node, DESCRIPTION_ELEMENT) &&
@@ -928,6 +945,7 @@ public class BeanDefinitionParserDelegate {
 			}
 		}
 
+		// TODO 不能同时存在 ref value
 		boolean hasRefAttribute = ele.hasAttribute(REF_ATTRIBUTE);
 		boolean hasValueAttribute = ele.hasAttribute(VALUE_ATTRIBUTE);
 		if ((hasRefAttribute && hasValueAttribute) ||

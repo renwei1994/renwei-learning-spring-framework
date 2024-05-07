@@ -872,10 +872,22 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		// Trigger initialization of all non-lazy singleton beans...
 		for (String beanName : beanNames) {
+			// 这里感觉太鸡肋了 感觉没啥用  主要就是为了合并父子BeanDefinition
+			// <bean id="A" class="com.xxx.A" lazy-init="true"></bean>
+			// <bean id="B" class="com.xxx.B" parent="A"/> // 指定parent属性继承
+			// (B) beanDefinitionMap存放原本的B的bean定义，而mergedBeanDefinitions存储的B是B与A合并之后的新bean定义
+			// (A) beanDefinitionMap存放原本的A的bean定义，而mergedBeanDefinitions存储的是原本A bean定义的clone
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
+
+			// 如果不是抽象、是单例、不是懒加载
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
+
+				// 如果是FactoryBean
 				if (isFactoryBean(beanName)) {
+					// 给FactoryBean name加前缀&
+					// 注意这里的逻辑是：如果是BeanFatory 直接获取初始化完成的Bean
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
+					// 再次确认实例是否为FactoryBean
 					if (bean instanceof FactoryBean) {
 						FactoryBean<?> factory = (FactoryBean<?>) bean;
 						boolean isEagerInit;
@@ -893,6 +905,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 						}
 					}
 				}
+				// 如果不是
 				else {
 					getBean(beanName);
 				}
@@ -929,6 +942,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		Assert.hasText(beanName, "Bean name must not be empty");
 		Assert.notNull(beanDefinition, "BeanDefinition must not be null");
 
+		// 如果是AbstractBeanDefinition.就进行校验
 		if (beanDefinition instanceof AbstractBeanDefinition) {
 			try {
 				((AbstractBeanDefinition) beanDefinition).validate();
@@ -939,11 +953,15 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 		}
 
+		// 看beanDefinitionMap是否已经有这个beanName的beanDefinition
 		BeanDefinition existingDefinition = this.beanDefinitionMap.get(beanName);
+		// 如果有
 		if (existingDefinition != null) {
+			// 是否允许bean定义信息被覆盖
 			if (!isAllowBeanDefinitionOverriding()) {
 				throw new BeanDefinitionOverrideException(beanName, beanDefinition, existingDefinition);
 			}
+			// 如果已存在的bean的角色小于当前bean定义的角色
 			else if (existingDefinition.getRole() < beanDefinition.getRole()) {
 				// e.g. was ROLE_APPLICATION, now overriding with ROLE_SUPPORT or ROLE_INFRASTRUCTURE
 				if (logger.isInfoEnabled()) {
@@ -952,6 +970,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 							existingDefinition + "] with [" + beanDefinition + "]");
 				}
 			}
+			// 如果已存在的bean定义信息和当前bean定义信息不相等
 			else if (!beanDefinition.equals(existingDefinition)) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("Overriding bean definition for bean '" + beanName +
@@ -966,6 +985,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 							"] with [" + beanDefinition + "]");
 				}
 			}
+			// 把当前beanDefinition信息put进去
 			this.beanDefinitionMap.put(beanName, beanDefinition);
 		}
 		else {
@@ -982,7 +1002,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 			else {
 				// Still in startup registration phase
+				// name - BeanDefinition
 				this.beanDefinitionMap.put(beanName, beanDefinition);
+				// name
 				this.beanDefinitionNames.add(beanName);
 				removeManualSingletonName(beanName);
 			}

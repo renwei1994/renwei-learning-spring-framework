@@ -137,10 +137,19 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	public ClassPathXmlApplicationContext(
 			String[] configLocations, boolean refresh, @Nullable ApplicationContext parent)
 			throws BeansException {
-
+		// 配置环境资源对象
+		// parent为null 初始化一些特定属性值
+		// TODO 创建资源模式处理器  解析当前项目的一些配置文件（xml文件、配置文件）
 		super(parent);
+		// 设置配置路径
+		// TODO 任卫 于将参数configLocations指定的Spring配置文件路径中的${PlaceHolder}占位符，
+		//  替换为系统变量中PlaceHolder对应的Value值，并存储到成员变量configLocations中，
+		//  方便我们后续将Bean定义加载为BeanDefinition前，获取配置文件的字节输入流
+		//  并且设置环境变量值
 		setConfigLocations(configLocations);
 		if (refresh) {
+			// TODO 任卫 Spring Bean加载的【核心方法】，它是ClassPathXmlApplicationContext的父类AbstractApplicationContext的一个方法，
+			//  用于刷新Spring容器上下文信息，定义了Spring容器Bean加载的流程
 			refresh();
 		}
 	}
