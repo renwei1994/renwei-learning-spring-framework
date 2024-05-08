@@ -90,6 +90,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 			this.resourceLoader = (ResourceLoader) this.registry;
 		}
 		else {
+			// 为reader设置一个ResourceLoader
 			this.resourceLoader = new PathMatchingResourcePatternResolver();
 		}
 
@@ -98,6 +99,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 			this.environment = ((EnvironmentCapable) this.registry).getEnvironment();
 		}
 		else {
+			// 设置环境属性 创建一个StandardEnvironment  并设置MutablePropertySources propertySources
 			this.environment = new StandardEnvironment();
 		}
 	}
@@ -211,7 +213,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource[])
 	 */
 	public int loadBeanDefinitions(String location, @Nullable Set<Resource> actualResources) throws BeanDefinitionStoreException {
-		ResourceLoader resourceLoader = getResourceLoader();
+		ResourceLoader resourceLoader = getResourceLoader();//此处获取resourceLoader对象
 		if (resourceLoader == null) {
 			throw new BeanDefinitionStoreException(
 					"Cannot load bean definitions from location [" + location + "]: no ResourceLoader available");
@@ -220,7 +222,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		if (resourceLoader instanceof ResourcePatternResolver) {
 			// Resource pattern matching available.
 			try {
-				Resource[] resources = ((ResourcePatternResolver) resourceLoader).getResources(location);
+				Resource[] resources = ((ResourcePatternResolver) resourceLoader).getResources(location);// 调用DefaultResourceLoader的getResource完成具体的Resource定位
 				int count = loadBeanDefinitions(resources);
 				if (actualResources != null) {
 					Collections.addAll(actualResources, resources);

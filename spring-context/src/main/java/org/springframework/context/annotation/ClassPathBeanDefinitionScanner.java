@@ -162,7 +162,9 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
 		this.registry = registry;
 
+		// 如果没有特殊定义的话 为true
 		if (useDefaultFilters) {
+			// 注册默认的过滤器
 			registerDefaultFilters();
 		}
 		setEnvironment(environment);
@@ -272,8 +274,11 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
 		Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<>();
+		// 循环遍历basePackages
 		for (String basePackage : basePackages) {
+			// 获取候选的bean 解下该包下的所有类  并解析成BeanDefinition
 			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
+			// 循环处理包下面符合条件并被解析成BeanDefinition的类
 			for (BeanDefinition candidate : candidates) {
 				ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(candidate);
 				candidate.setScope(scopeMetadata.getScopeName());
@@ -282,13 +287,17 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 					postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
 				}
 				if (candidate instanceof AnnotatedBeanDefinition) {
+					// 处理通用的属性
 					AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
 				}
+				// 如果容器中没有该BeanDefinition 则注册
 				if (checkCandidate(beanName, candidate)) {
+					// 跟xml一样 还是封装成BeanDefinitionHolder
 					BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(candidate, beanName);
 					definitionHolder =
 							AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
 					beanDefinitions.add(definitionHolder);
+					// 注册到容器当中
 					registerBeanDefinition(definitionHolder, this.registry);
 				}
 			}

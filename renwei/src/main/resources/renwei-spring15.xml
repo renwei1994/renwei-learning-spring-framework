@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:user="http://www.rw.com/schema/user"
+	   xmlns:people="http://www.rw.com/schema/rw"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.rw.com/schema/rw http://www.rw.com/schema/rw.xsd
+       http://www.rw.com/schema/user http://www.rw.com/schema/user.xsd">
+
+	<bean id="user" name="userrw" class="com.renwei.entity.User">
+		<property name="name" value="rw"></property>
+		<property name="address" value="四川省-成都市-双流区"></property>
+	</bean>
+
+
+	<context:component-scan base-package="com.renwei.editor"></context:component-scan>
+
+</beans>

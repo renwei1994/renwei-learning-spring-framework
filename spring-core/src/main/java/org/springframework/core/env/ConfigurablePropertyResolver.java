@@ -91,6 +91,7 @@ public interface ConfigurablePropertyResolver extends PropertyResolver {
 	 * Specify which properties must be present, to be verified by
 	 * {@link #validateRequiredProperties()}.
 	 */
+	// TODO 添加必要属性值  表set进来的所有属性都会被检查，看环境变量内是够有该属性
 	void setRequiredProperties(String... requiredProperties);
 
 	/**
@@ -100,6 +101,7 @@ public interface ConfigurablePropertyResolver extends PropertyResolver {
 	 * @throws MissingRequiredPropertiesException if any of the required
 	 * properties are not resolvable.
 	 */
+	// TODO 检查环境变量中是否有上面设置的所有属性值。
 	void validateRequiredProperties() throws MissingRequiredPropertiesException;
 
 }

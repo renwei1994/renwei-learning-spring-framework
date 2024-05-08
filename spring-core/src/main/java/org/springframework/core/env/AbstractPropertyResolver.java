@@ -207,6 +207,7 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 		if (this.strictHelper == null) {
 			this.strictHelper = createPlaceholderHelper(false);
 		}
+		// TODO 替换配置文件路径对应的占位符
 		return doResolvePlaceholders(text, this.strictHelper);
 	}
 

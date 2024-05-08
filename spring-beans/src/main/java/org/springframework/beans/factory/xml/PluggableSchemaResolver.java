@@ -61,6 +61,7 @@ public class PluggableSchemaResolver implements EntityResolver {
 	 * The location of the file that defines schema mappings.
 	 * Can be present in multiple JAR files.
 	 */
+	//	定义架构映射的文件的位置。可以存在于多个JAR文件中。
 	public static final String DEFAULT_SCHEMA_MAPPINGS_LOCATION = "META-INF/spring.schemas";
 
 
@@ -85,6 +86,8 @@ public class PluggableSchemaResolver implements EntityResolver {
 	 */
 	public PluggableSchemaResolver(@Nullable ClassLoader classLoader) {
 		this.classLoader = classLoader;
+		// TODO 定义架构映射的文件的位置。可以存在于多个JAR文件中。 "META-INF/spring.schemas"
+		//  先把该配置文件读取到，我就只到xsd对应本地哪个目录了，再接下来的解析过程中，我不需要从网络上找我的配置资源
 		this.schemaMappingsLocation = DEFAULT_SCHEMA_MAPPINGS_LOCATION;
 	}
 

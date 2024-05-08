@@ -203,6 +203,8 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 */
 	@SuppressWarnings("unchecked")
 	protected void registerDefaultFilters() {
+		// 默认注册Component注解
+		// TODO 这也是为啥spring查找带有如@Component、@Service、@Repository或@Controller等注解的类
 		this.includeFilters.add(new AnnotationTypeFilter(Component.class));
 		ClassLoader cl = ClassPathScanningCandidateComponentProvider.class.getClassLoader();
 		try {
@@ -415,19 +417,26 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	private Set<BeanDefinition> scanCandidateComponents(String basePackage) {
 		Set<BeanDefinition> candidates = new LinkedHashSet<>();
 		try {
+			// classpath*:com/renwei/annotate/**/*.class
 			String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
 					resolveBasePackage(basePackage) + '/' + this.resourcePattern;
+			// 拿到packageSearchPath下的所有class文件
 			Resource[] resources = getResourcePatternResolver().getResources(packageSearchPath);
 			boolean traceEnabled = logger.isTraceEnabled();
 			boolean debugEnabled = logger.isDebugEnabled();
+			// 循环遍历每个class文件
 			for (Resource resource : resources) {
 				if (traceEnabled) {
 					logger.trace("Scanning " + resource);
 				}
+				// 验证文件是否准备
 				if (resource.isReadable()) {
 					try {
+						// 元数据读取器 里面包含通过类加载器获取元数据
 						MetadataReader metadataReader = getMetadataReaderFactory().getMetadataReader(resource);
+						// 是否能匹配过滤器条件 （是否含有@Component）
 						if (isCandidateComponent(metadataReader)) {
+							// TODO 如果有就把元数据 、 resource 、className 封装成ScannedGenericBeanDefinition
 							ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
 							sbd.setSource(resource);
 							if (isCandidateComponent(sbd)) {
