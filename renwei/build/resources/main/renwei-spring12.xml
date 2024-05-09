@@ -8,6 +8,10 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.rw.com/schema/rw http://www.rw.com/schema/rw.xsd
        http://www.rw.com/schema/user http://www.rw.com/schema/user.xsd">
-	<context:component-scan base-package="com.renwei.MergedBeanDefinitionPostProcessor"></context:component-scan>
 
+<!--	<bean id="jiaZhou" class="com.renwei.populateBean.JiaZhou" autowire="byName"></bean>-->
+	<bean id="jiaZhou1" class="com.renwei.populateBean.JiaZhou" autowire="byType"></bean>
+	<bean id="address" class="com.renwei.populateBean.Address"></bean>
+	<bean id="schoolmpl1" class="com.renwei.populateBean.Schoolmpl1"></bean>
+	<bean id="schoolmpl2" class="com.renwei.populateBean.Schoolmpl2"></bean>
 </beans>

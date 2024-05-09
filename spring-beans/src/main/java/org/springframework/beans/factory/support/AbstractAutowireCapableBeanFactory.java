@@ -602,22 +602,30 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Eagerly cache singletons to be able to resolve circular references
 		// even when triggered by lifecycle interfaces like BeanFactoryAware.
 		// 判断当前bean是否需要提前曝光:单例&允许循环依赖&当前bean正在创建中，检测循环依赖
-		boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
+		boolean earlySingletonExposure =
+				// 是否是单例
+				(mbd.isSingleton() &&
+						// 是否循环依赖
+						this.allowCircularReferences &&
+						// 当前bean正在创建中，检测循环依赖
 				isSingletonCurrentlyInCreation(beanName));
 		if (earlySingletonExposure) {
 			if (logger.isTraceEnabled()) {
 				logger.trace("Eagerly caching bean '" + beanName +
 						"' to allow for resolving potential circular references");
 			}
+			// 为避免后期循环依赖，可以在bean初始化完成前将创建实例的0bjectFactory加入工厂
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 		}
 
 		// Initialize the bean instance.
+		//初始化bean实例
 		Object exposedObject = bean;
 		try {
-			// 填充属性
+			// 填充属性 对bean的属性进行填充，将各个属性值注入，其中，可能存在依赖于其他bean的属性，则会递归初始化依赖的bean
 			populateBean(beanName, mbd, instanceWrapper);
 			// 初始化（BeanPostProcessor的前后置方法，在init-method前后执行）
+			// 执行初始化逻辑
 			exposedObject = initializeBean(beanName, exposedObject, mbd);
 		}
 		catch (Throwable ex) {
@@ -1431,6 +1439,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Give any InstantiationAwareBeanPostProcessors the opportunity to modify the
 		// state of the bean before properties are set. This can be used, for example,
 		// to support styles of field injection.
+		// TODO InstantiationAwareBeanPostProcessor 的 postProcessAfterInstantiation 方法的执行
 		if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
 				if (bp instanceof InstantiationAwareBeanPostProcessor) {
@@ -1442,8 +1451,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
+		// 下面的PropertyValues其实就是拿取的 id 和 age
+		/*
+		 * 	<bean id="jiaZhou1" class="com.renwei.populateBean.JiaZhou" >
+		 * 		<property name="id" value="1"></property>
+		 * 		<property name="age" value="18"></property>
+		 * 	</bean>
+		 */
 		PropertyValues pvs = (mbd.hasPropertyValues() ? mbd.getPropertyValues() : null);
 
+		// 根据装配类型去装配  可以根据名字  也可以根据type
 		int resolvedAutowireMode = mbd.getResolvedAutowireMode();
 		if (resolvedAutowireMode == AUTOWIRE_BY_NAME || resolvedAutowireMode == AUTOWIRE_BY_TYPE) {
 			MutablePropertyValues newPvs = new MutablePropertyValues(pvs);
