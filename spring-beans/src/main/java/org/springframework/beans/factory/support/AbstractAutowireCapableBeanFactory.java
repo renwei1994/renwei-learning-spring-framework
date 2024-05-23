@@ -515,6 +515,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		try {
+			// 给BeanPostProcessor一个机会来创建一个代理对象来替代目标对象
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
 			// TODO 如果容器中含有InstantiationAwareBeanPostProcessor，那么会依次执行 InstantiationAwareBeanPostProcessor
 			//  可以创建代理对象
@@ -1863,6 +1864,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// 执行 BeanPostProcessor postProcessBeforeInitialization方法
 		Object wrappedBean = bean;
+		// 如果mdb不为null
+		// mbd不是"synthetic" 一般是指只有A0P相关的prointcut配置或者Advice配置才会将 synthetic设置为true
 		if (mbd == null || !mbd.isSynthetic()) {
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
@@ -1878,6 +1881,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		if (mbd == null || !mbd.isSynthetic()) {
 			// 执行 BeanPostProcessor postProcessAfterInitialization方法
+			// 代理对象的创建也是在这个地方
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
 		}
 
@@ -1933,6 +1937,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				}
 			}
 			else {
+				// afterPropertiesSet
 				((InitializingBean) bean).afterPropertiesSet();
 			}
 		}
@@ -1942,6 +1947,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			if (StringUtils.hasLength(initMethodName) &&
 					!(isInitializingBean && "afterPropertiesSet".equals(initMethodName)) &&
 					!mbd.isExternallyManagedInitMethod(initMethodName)) {
+				// init方法
 				invokeCustomInitMethod(beanName, bean, mbd);
 			}
 		}

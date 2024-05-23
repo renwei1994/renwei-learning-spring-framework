@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:user="http://www.rw.com/schema/user"
+	   xmlns:people="http://www.rw.com/schema/rw"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	    http://www.springframework.org/schema/aop  http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.rw.com/schema/rw http://www.rw.com/schema/rw.xsd
+       http://www.rw.com/schema/user http://www.rw.com/schema/user.xsd">
+
+
+	<context:component-scan base-package="com.renwei.Cyclicdependence"></context:component-scan>
+
+	<bean id="a" class="com.renwei.Cyclicdependence.A">
+		<property name="b" ref="b"></property>
+	</bean>
+
+	<bean id="b" class="com.renwei.Cyclicdependence.B">
+		<property name="a" ref="a"></property>
+	</bean>
+
+	<!-- 配置切面 -->
+	<bean id="longger" class="com.renwei.Cyclicdependence.Longger"></bean>
+
+
+
+	<!-- 启用AspectJ自动代理 -->
+	<aop:aspectj-autoproxy />
+
+	<!-- 配置AOP -->
+	<aop:config>
+		<!-- 定义切点 -->
+		<aop:pointcut id="myPointcut" expression="execution(* com.renwei.Cyclicdependence.*.*(..))" />
+
+		<!-- 将切面和切点关联起来 -->
+		<aop:aspect ref="longger">
+			<!-- 配置前置通知 -->
+			<aop:before method="before" pointcut-ref="myPointcut" />
+		</aop:aspect>
+	</aop:config>
+</beans>
