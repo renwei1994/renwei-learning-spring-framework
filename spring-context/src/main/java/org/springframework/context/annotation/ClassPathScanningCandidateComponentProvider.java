@@ -496,11 +496,14 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 * @return whether the class qualifies as a candidate component
 	 */
 	protected boolean isCandidateComponent(MetadataReader metadataReader) throws IOException {
+		// 先检查类有没有被排除过滤器匹配上，有就直接返回 false 不扫描；
 		for (TypeFilter tf : this.excludeFilters) {
 			if (tf.match(metadataReader, getMetadataReaderFactory())) {
 				return false;
 			}
 		}
+
+		// 再看有没有被包含过滤器匹配上，默认包含过滤器只认带 @Component 的类，匹配上且条件符合才返回 true，成为候选组件。
 		for (TypeFilter tf : this.includeFilters) {
 			if (tf.match(metadataReader, getMetadataReaderFactory())) {
 				return isConditionMatch(metadataReader);

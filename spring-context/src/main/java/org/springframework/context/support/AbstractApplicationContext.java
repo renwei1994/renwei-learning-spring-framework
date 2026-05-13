@@ -556,7 +556,27 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 				// Invoke factory processors registered as beans in the context.
 				// TODO 执行所有的BeanDefinition增强器
+				//  	【ConfigurationClassPostProcessor 核心流程注释】
+				//  TODO 先处理 @PropertySource（加载属性文件）
+
+				//	TODO 再拿 @ComponentScan @ComponentScan 会识别路径下含有以下注解的类：
+				//		1、@Component 本身  并标记为 Full/Lite 配置类候选者
+				//		（标记成 Full 或 Lite 配置类，是给 Spring 做 “解析优先级” 和 “处理逻辑” 的分层：
+				//		Full 模式的 @Configuration 类会被 CGLIB 代理，保证 @Bean 方法每次调用都返回容器里的单例，不会重复创建新对象；
+				//		Lite 模式的类不用代理，直接按普通组件处理，能节省性能开销。
+				//		同时这个标记也会让 Spring 优先把它们当成配置类入口，而不是普通 Bean，这样 @Import、@Bean 这些注解才会被深度解析，而不是只当成普通类的元数据忽略掉。）
+				//		2、@Repository、@Service、@Controller（它们都元注解了 @Component）
+				//		3、@Configuration（它也元注解了 @Component）
 				//
+				//	TODO 如果这些注解上还有@Import
+				//		会调用 processImports() 方法解析其上的 @Import 注解，并按规则递归处理导入的类、ImportSelector、ImportBeanDefinitionRegistrar 等。
+				//      会把 @Import 里面的类解析成 sourceClass 然后解析成BeanDefinition
+				//
+				//	TODO 然后处理 @ImportResource 最后解析 @Bean 方法
+
+				//  TODO  通过扫描、@Import（普通类）、@Bean 方法等生成的 BeanDefinition 是在解析过程中立即注册到容器的，并非等到所有递归完成后才统一注册。
+				//       不过最终确实所有相关 BeanDefinition 都已完成注册
+				//       @Configuration 类进行 CGLIB 增强（避免 @Bean 方法被重复调用）
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
