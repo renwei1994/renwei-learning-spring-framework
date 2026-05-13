@@ -435,6 +435,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 						// 元数据读取器 里面包含通过类加载器获取元数据
 						MetadataReader metadataReader = getMetadataReaderFactory().getMetadataReader(resource);
 						// 是否能匹配过滤器条件 （是否含有@Component）
+						// @ComponentScan 只会扫描包下的 @Component 修饰的类  @Import
 						if (isCandidateComponent(metadataReader)) {
 							// TODO 如果有就把元数据 、 resource 、className 封装成ScannedGenericBeanDefinition
 							ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
