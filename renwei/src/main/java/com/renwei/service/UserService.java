@@ -1,5 +1,6 @@
 package com.renwei.service;
 
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 /**
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
  * @Description: TODO
  * @Version: 1.0
  */
+@Component
 public class UserService {
 	public void show() {
 		System.out.println("Hello Spring");

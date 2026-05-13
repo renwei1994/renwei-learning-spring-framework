@@ -1,8 +1,11 @@
 package com.renwei.test;
 
 import com.renwei.config.context.User;
+import com.renwei.service.AppConfig;
 import com.renwei.service.BeanTest;
+import com.renwei.service.UserService;
 import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.Map;
@@ -18,11 +21,11 @@ import java.util.Map;
 public class Test {
 
 	public static void main(String[] args) {
-//			AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
-//			applicationContext.register(UserService.class);
-//			applicationContext.refresh();
-//			UserService userService = applicationContext.getBean(UserService.class);
-//			userService.show();
+			AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
+			applicationContext.register(AppConfig.class);
+			applicationContext.refresh();
+			UserService userService = applicationContext.getBean(UserService.class);
+			userService.show();
 //		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("renwei-spring05.xml");
 //		ListableBeanFactory bean = applicationContext.getBean(ListableBeanFactory.class);
 //		Map<String, BeanTest> beansOfType = bean.getBeansOfType(BeanTest.class);
