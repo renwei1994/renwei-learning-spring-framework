@@ -581,6 +581,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 				// Register bean processors that intercept bean creation.
 				// TODO 注册BeanPostProcessor
+				// 		如果用户自定义了 BeanPostProcessor（例如通过 @Component 标注一个类实现 BeanPostProcessor），
+				// 		这个类需要通过 ConfigurationClassPostProcessor 先被扫描并注册为 BeanDefinition，
+				// 		然后在 registerBeanPostProcessors 阶段被实例化和再注册成 BeanPostProcessor 生效。所以这两个步骤有明确的上下游依赖关系。
+				// 		后面 Spring 初始化任何 Bean 时，都会经过这些后置处理器（比如 @Autowired、@Value 处理）
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
