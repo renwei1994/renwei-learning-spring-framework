@@ -250,7 +250,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		Object bean;
 
 		// Eagerly check singleton cache for manually registered singletons.
-		// 提前检査单例缓存中是否有手动注册的单例对象，跟循环依赖有关联
+		// TODO 提前检査单例缓存中是否有手动注册的单例对象，跟循环依赖有关联
+		// 		顺序是：先查一级缓存 singletonObjects，没有且 Bean 正在创建中，(如果 Bean 不在创建中，说明是首次正常获取，不是循环依赖场景，那查完一级缓存 singletonObjects 没有，就直接返回 null，走后续的 Bean 创建流程，不会去碰二、三级缓存。)
+		// 		再查二级缓存 earlySingletonObjects，
+		// 		还没有就查三级缓存 singletonFactories，调用工厂生成早期 Bean 后移到二级缓存。
 		Object sharedInstance = getSingleton(beanName);
 		// TODO 特殊处理FactoryBean
 		if (sharedInstance != null && args == null) {

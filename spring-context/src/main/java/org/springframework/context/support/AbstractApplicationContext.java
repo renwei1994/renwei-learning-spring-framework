@@ -604,7 +604,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
-				// TODO 实例化
+				// TODO 实例化 把所有单例 Bean 全部创建出来！
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
@@ -939,7 +939,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
 		// Initialize conversion service for this context.
-		// 为上下文初始化类型转换器  跟属性编辑器功能类似  但是属性编辑器只能操作源数据为string  但是转换器能转换任意类型
+		// TODO 为上下文初始化类型转换器  跟属性编辑器功能类似  但是属性编辑器只能操作源数据为string  但是转换器能转换任意类型
+		//      @Value("2025-01-01")
+		//		private Date date;
+		//		字符串 → 自动转 Date
 		if (beanFactory.containsBean(CONVERSION_SERVICE_BEAN_NAME) &&
 				beanFactory.isTypeMatch(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class)) {
 			beanFactory.setConversionService(
@@ -949,7 +952,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// Register a default embedded value resolver if no bean post-processor
 		// (such as a PropertyPlaceholderConfigurer bean) registered any before:
 		// at this point, primarily for resolution in annotation attribute values.
-		// 如果beanFactory之前没有注册嵌入值解析器，则注册默认的嵌入值解析器，主要用于注解属性值的解析
+		// TODO 如果beanFactory之前没有注册嵌入值解析器，则注册默认的嵌入值解析器，主要用于注解属性值的解析
+		// 		 @Value("${server.port}")
+		// 		 Spring 把 ${server.port} 变成 8080
 		if (!beanFactory.hasEmbeddedValueResolver()) {
 			beanFactory.addEmbeddedValueResolver(strVal -> getEnvironment().resolvePlaceholders(strVal));
 		}
@@ -963,13 +968,17 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 		// Stop using the temporary ClassLoader for type matching.
 		// 禁止使用临时类加载器进行类型匹配
+		// Spring 把临时用的类加载器扔掉，准备正式开始创建所有 Bean！
 		beanFactory.setTempClassLoader(null);
 
 		// Allow for caching all bean definition metadata, not expecting further changes.
 		// 冻结所有的bean定义，说明注册的bean定义将不被修改或任何进一步的处理
+		// 饭店点菜阶段：你可以加菜、减菜、换菜
+		// 厨房开始炒菜了：直接锁菜单，不能再改了！
 		beanFactory.freezeConfiguration();
 
 		// Instantiate all remaining (non-lazy-init) singletons.
+		// TODO 触发剩下的非懒加载单例 Bean 批量实例化的关键，也是 BeanPostProcessor 开始真正生效的地方。
 		beanFactory.preInstantiateSingletons();
 	}
 
