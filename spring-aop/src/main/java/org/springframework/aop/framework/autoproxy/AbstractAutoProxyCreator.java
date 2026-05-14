@@ -355,6 +355,9 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		}
 
 		// Create proxy if we have advice.
+		// TODO 这个方法是去拿当前 Bean 能匹配到的所有切面通知器，也就是把容器里所有 @AspectJ 切面解析成 Advisor 后，
+		//  用切点表达式和当前 Bean 的类、方法做匹配，最后返回真正能织入的切面数组。
+		//  如果返回空数组就说明这个 Bean 不需要被代理，否则就走 createProxy 生成代理对象。
 		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
 		if (specificInterceptors != DO_NOT_PROXY) {
 			this.advisedBeans.put(cacheKey, Boolean.TRUE);

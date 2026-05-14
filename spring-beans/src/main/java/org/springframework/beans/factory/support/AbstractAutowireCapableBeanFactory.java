@@ -486,6 +486,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// clone the bean definition in case of a dynamically resolved Class
 		// which cannot be stored in the shared merged bean definition.
 		// TODO 锁定class  因为我们要使用class去反射实例化对象  而我们只有全路径  一个string
+		// 		把 BeanDefinition 里存的类名字符串，转成实际的 Class 对象，相当于给后续实例化对象 “拿好模板”。
 		Class<?> resolvedClass = resolveBeanClass(mbd, beanName);
 		if (resolvedClass != null && !mbd.hasBeanClass() && mbd.getBeanClassName() != null) {
 			mbdToUse = new RootBeanDefinition(mbd);
@@ -495,8 +496,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Prepare method overrides.
 		try {
 			// TODO 验证准备覆盖的方法  lookup-method replace-method
-			// lookup-method 解决单例引用原型的问题
-			// 给 BeanDefinition 的methodOverrides（MethodOverrides）的overrides（MethodOverride）中的overloaded设置为false
+			// 		lookup-method 解决单例引用原型的问题
+			// 		给 BeanDefinition 的methodOverrides（MethodOverrides）的overrides（MethodOverride）中的overloaded设置为false
 			/**
 			 * 在spring中创建的对象默认是单例类型
 			 *
@@ -505,7 +506,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			 *
 			 * 如果在单例对象中引用原型对象，怎么办？
 			 *
-			 * 默认情况下是可以，从单例对象中获取的所有原型对象是同一对象，意味着不是最新创建的对象，但是想从单例对象中获取的所有原型对象不是同一对象，即每次获取的原型对象是最新对象，那么可以使用 lookup-method
+			 * 默认情况下是可以，从单例对象中获取的所有原型对象是同一对象，意味着不是最新创建的对象，
+			 * 但是想从单例对象中获取的所有原型对象不是同一对象，即每次获取的原型对象是最新对象，那么可以使用 lookup-method
 			 */
 			mbdToUse.prepareMethodOverrides();
 		}
@@ -519,9 +521,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
 			// TODO 如果容器中含有InstantiationAwareBeanPostProcessor，那么会依次执行 InstantiationAwareBeanPostProcessor
 			//  可以创建代理对象
-			// postProcessBeforeInstantiation postProcessAfterInstantiation postProcessProperties这三个方法
-			// 如果postProcessBeforeInstantiation执行结果为null  那么继续执行postProcessAfterInstantiation
-			// 如果不为null  直接执行postProcessAfterInitialization
+			// 	postProcessBeforeInstantiation postProcessAfterInstantiation postProcessProperties这三个方法
+			// 	如果postProcessBeforeInstantiation执行结果为null  那么继续执行postProcessAfterInstantiation
+			// 	如果不为null  直接执行postProcessAfterInitialization
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
 			if (bean != null) {
 				return bean;
@@ -1261,6 +1263,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Candidate constructors for autowiring?
 		// TODO SmartInstantiationAwareBeanPostProcessor
 		//  从bean后置处理器中为自动装配寻找构造方法，有且仅有一个有参构造或者有且仅有@Autowired注解构造
+		//  1.Spring 准备创建一个 Bean。
+		//  2.调用 determineConstructorsFromBeanPostProcessors。
+		//  3.该方法遍历所有注册的 SmartInstantiationAwareBeanPostProcessor。
+		//  4.每个处理器都可以返回一个“推荐构造器数组”。
+		//  5.最终，Spring 使用第一个非空的返回结果（或如果没有处理器返回，则回退到默认的无参构造器）。
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
 		// 如果有构造参数
 		if (ctors != null || mbd.getResolvedAutowireMode() == AUTOWIRE_CONSTRUCTOR ||
